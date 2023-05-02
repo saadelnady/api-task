@@ -7,11 +7,13 @@ function removeClassActive() {
     btn.classList.remove("active");
   });
 }
+let i = 1;
 
 function nextUser() {
   if (i < 10) {
     i++;
-    getResponse();
+    getUsers();
+    getPosts(i);
     removeClassActive();
     nextBtn.classList.add("active");
   } else {
@@ -23,8 +25,8 @@ function nextUser() {
 function previousUser() {
   if (i > 1) {
     i--;
-
-    getResponse();
+    getUsers();
+    getPosts(i);
     removeClassActive();
     previousBtn.classList.add("active");
   } else {
@@ -32,9 +34,8 @@ function previousUser() {
     return false;
   }
 }
-let i = 1;
 
-function getUsers(url) {
+function getResponse(url) {
   return new Promise((resolve) => {
     fetch(url).then((response) => {
       resolve(response.json());
@@ -42,8 +43,8 @@ function getUsers(url) {
   });
 }
 
-function getResponse() {
-  getUsers(`https://jsonplaceholder.typicode.com/users/${i}`)
+function getUsers() {
+  getResponse(`https://jsonplaceholder.typicode.com/users/${i}`)
     .then((data) => {
       let Name = data.name;
       let userName = data.username;
@@ -62,7 +63,7 @@ function getResponse() {
 
       card.innerHTML = `
                         <h2 class="name"> ${Name}</h2>
-                        <p class="userName"><span>userName</span> : ${userName}</p>
+                        <p class="userName"><span>userName:</span>  ${userName}</p>
                         <p class="userEmail"><span>Email :</span>   ${userEmail}</p>
                         <p class=" userAddressStreet"><span>street :</span> ${userAddressStreet}</p>
                         <p class=" userAddressSuite"><span>suite :</span> ${userAddressSuite}</p>
@@ -74,31 +75,64 @@ function getResponse() {
                         <p class="zipcode"> <span>phrase:</span> ${companyPhrase}</p>
                         <p class="zipcode"> <span>bs:</span> ${companyBs}</p>
         `;
-      return getUsers(`https://jsonplaceholder.typicode.com/posts`);
-    })
-    .then((data) => {
-      let posts = document.querySelector(".posts");
-
-      data.filter((post) => {
-        if (post.userId === i) {
-          let postId = post.id;
-          let postTitle = post.title;
-          let postBody = post.body;
-          let postDiv = document.createElement("div");
-          postDiv.className = "post";
-          postDiv.innerHTML = ` 
-             <span>${postId}</span> 
-             <h3 class="title">${postTitle}</h3>
-             <p class="postContent">${postBody}</p>`;
-          posts.append(postDiv);
-        }
-      });
     })
 
     .catch((error) => {
       console.log(error);
     });
 }
-getResponse();
+
+// function getPosts() {
+//   getResponse(`https://jsonplaceholder.typicode.com/posts`)
+//     .then((data) => {
+//       let posts = document.querySelector(".posts");
+
+//       data.filter((post) => {
+//         if (post.userId === i) {
+//           let postDiv = document.createElement("div");
+//           postDiv.className = "post";
+//           let postId = post.id;
+//           let postTitle = post.title;
+//           let postBody = post.body;
+//           postDiv.innerHTML += `<span>${postId}</span>
+//                                     <h3 class="title">${postTitle}</h3>
+//                                     <p class="postContent">${postBody}</p>`;
+//           posts.append(postDiv);
+//         }
+//       });
+//     })
+//     .catch((error) => {
+//       console.log(error);
+//     });
+// }
+
+function getPosts(user_id) {
+  getResponse(`https://jsonplaceholder.typicode.com/posts`).then((data) => {
+    let posts = document.querySelector(".posts");
+
+    const allPosts = [...data];
+
+    const filteredData = allPosts.filter((item) => item.userId === user_id);
+
+    let singlePostWrapper = "";
+    filteredData.map((post) => {
+      console.log(post);
+      let postId = post.id;
+      let postTitle = post.title;
+      let postBody = post.body;
+      singlePostWrapper += `
+                <div class="post">
+                    <span>${postId}</span>
+                    <h3 class="title">${postTitle}</h3>
+                    <p class="postContent">${postBody}</p>
+                </div >
+                `;
+    });
+    posts.innerHTML = singlePostWrapper;
+  });
+}
+getUsers();
+getPosts(i);
+
 nextBtn.onclick = nextUser;
 previousBtn.onclick = previousUser;
