@@ -10,13 +10,13 @@ function removeClassActive() {
 let i = 1;
 
 function nextUser() {
-    removeDisabled();
     if (i < 10) {
         i++;
         getUsers();
         getPosts(i);
         removeClassActive();
         nextBtn.classList.add("active");
+        removeDisabled();
     } else {
         nextBtn.classList.add("disabled");
         return false;
@@ -24,12 +24,12 @@ function nextUser() {
 }
 
 function previousUser() {
-    removeDisabled();
     if (i > 1) {
         i--;
         getUsers();
         getPosts(i);
         removeClassActive();
+        removeDisabled();
     } else {
         previousBtn.classList.add("disabled");
         return false;
